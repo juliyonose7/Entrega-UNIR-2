@@ -34,13 +34,3 @@ Este proyecto contiene la solución interactiva para la actividad **"Laboratorio
 2. Nota: los navegadores bloquean peticiones XMLHttpRequest locales bajo `file://` por políticas de seguridad; para las pruebas AJAX locales, utiliza la Opción A o las URLs públicas preparadas en la interfaz.
 
 ---
-
-## Archivos Entregables
-
-1. **`Solucion_Laboratorio_JavaScript_AJAX.docx`**: Memoria técnica formal para entrega en formato Microsoft Word (estilo sobrio en negro, sin mención a calificaciones ni paréntesis excesivos).
-2. **`Solucion_Laboratorio_JavaScript_AJAX.pdf`**: Documento generado en formato PDF para envío en la plataforma educativa (7 páginas, conforme al límite de 10 páginas).
-3. **`index.html`**: Aplicación web completa en React + CSS.
-4. **`styles.css`**: Hoja de estilos moderna y responsive.
-5. **`servidor.py` / `iniciar_servidor.bat`**: Servidor local HTTP para pruebas de AJAX.
-6. **`laboratorio_clasico.html`**: Versión clásica HTML+JS puro del laboratorio.
-7. **`data/`**: Archivos de prueba (`ejemplo.txt`, `datos.json`, `fragmento.html`).
