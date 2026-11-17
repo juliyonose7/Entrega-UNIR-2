@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Laboratorio AJAX Clásico - JavaScript y AJAX</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 20px;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+    h1 {
+      color: #1a365d;
+      border-bottom: 2px solid #2b6cb0;
+      padding-bottom: 10px;
+    }
+    .formulario {
+      margin-bottom: 20px;
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+    }
+    input[type="text"] {
+      width: 60%;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #a0aec0;
+      border-radius: 4px;
+    }
+    input[type="button"], button {
+      padding: 8px 15px;
+      font-size: 14px;
+      background-color: #2b6cb0;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    input[type="button"]:hover, button:hover {
+      background-color: #2c5282;
+    }
+    .panel {
+      background: white;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+    }
+    .panel h3 {
+      margin-top: 0;
+      color: #2d3748;
+      font-size: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 6px;
+    }
+    .zona-contenido {
+      background-color: #1a202c;
+      color: #e2e8f0;
+      font-family: "Courier New", Courier, monospace;
+      padding: 10px;
+      min-height: 120px;
+      max-height: 300px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .badge-info { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+    .badge-ok { background: #f0fff4; color: #276749; border: 1px solid #c6f6d5; }
+    .badge-err { background: #fff5f5; color: #9b2c2c; border: 1px solid #fed7d7; }
+    .enlace-react {
+      display: inline-block;
+      margin-bottom: 15px;
+      font-weight: bold;
+      color: #2b6cb0;
+      text-decoration: none;
+    }
+    .enlace-react:hover { text-decoration: underline; }
+  </style>
+  <script>
+    var peticion_http;
+
+    function inicializa_xhr() {
+      if (window.XMLHttpRequest) {
+        return new XMLHttpRequest();
+      } else if (window.ActiveXObject) {
+        return new ActiveXObject("Microsoft.XMLHTTP");
+      }
+    }
+
+    // Criterio 5: Al cargar la página, mostrar por defecto la URL de la propia página
+    window.onload = function() {
+      var recurso = document.getElementById('recurso');
+      if (recurso) {
+        recurso.value = window.location.href;
+      }
+      mostrarEstado('0 - No iniciada');
+    };
+
+    function mostrarContenidos() {
+      var recurso = document.getElementById('recurso').value;
+      if (!recurso) {
+        alert("Por favor, introduzca una URL.");
+        return;
+      }
+
+      peticion_http = inicializa_xhr();
+      if (!peticion_http) {
+        alert("No ha sido posible crear una instancia de XMLHttpRequest.");
+        return;
+      }
+
+      // Criterio 7: Mostrar en todo momento el estado en el que se encuentra la petición
+      peticion_http.onreadystatechange = procesaRespuesta;
+
+      try {
+        peticion_http.open('GET', recurso, true);
+        peticion_http.send(null);
+      } catch (e) {
+        alert("Error al abrir la conexión: " + e.message);
+      }
+    }
+
+    function procesaRespuesta() {
+      var estados = [
+        '0 - No iniciada',
+        '1 - Cargando / Conexión abierta',
+        '2 - Cabeceras recibidas',
+        '3 - Descargando / Interactiva',
+        '4 - Completada'
+      ];
+
+      // Criterio 7: En la zona Estados de la petición
+      var readyState = peticion_http.readyState;
+      mostrarEstado(estados[readyState] || ('Estado: ' + readyState));
+
+      // Criterio 8: Mostrar cabeceras HTTP en estado 2 o superior
+      if (readyState >= 2) {
+        try {
+          var cabeceras = peticion_http.getAllResponseHeaders();
+          document.getElementById('cabeceras').innerHTML = '<pre>' + (cabeceras || '(Cabeceras no disponibles)') + '</pre>';
+        } catch (e) {
+          document.getElementById('cabeceras').innerText = 'Error al leer cabeceras: ' + e.message;
+        }
+      }
+
+      // Criterio 6 y Criterio 9: Al completarse (readyState === 4)
+      if (readyState === 4) {
+        // Criterio 9: Mostrar el código y texto de la respuesta en la zona Código de estado
+        var codigo = peticion_http.status;
+        var texto = peticion_http.statusText || (codigo === 200 ? 'OK' : 'Completado');
+        var zonaCodigo = document.getElementById('codigo');
+        
+        var claseBadge = (codigo >= 200 && codigo < 300) ? 'badge-ok' : 'badge-err';
+        zonaCodigo.innerHTML = '<span class="badge ' + claseBadge + '">' + codigo + ' ' + texto + '</span>';
+
+        // Criterio 6: Mostrar contenido de la respuesta en Contenidos del archivo
+        var zonaContenidos = document.getElementById('contenidos');
+        if (codigo >= 200 && codigo < 300 || codigo === 304) {
+          zonaContenidos.innerText = peticion_http.responseText;
+        } else if (codigo === 0) {
+          zonaContenidos.innerText = 
+            "[AVISO DE PROTOCOLO FILE:// O RESTRICCIÓN CORS]\n" +
+            "El navegador bloquea peticiones XMLHttpRequest al abrir con file://.\n" +
+            "Para probarlo con éxito, ejecute el servidor local con 'iniciar_servidor.bat'\n" +
+            "y acceda a: http://localhost:8000/laboratorio_clasico.html";
+        } else {
+          zonaContenidos.innerText = "[ERROR " + codigo + " " + texto + "]\n" + peticion_http.responseText;
+        }
+      }
+    }
+
+    function mostrarEstado(mensaje) {
+      var zonaEstado = document.getElementById('estados');
+      if (zonaEstado) {
+        zonaEstado.innerHTML = '<span class="badge badge-info">' + mensaje + '</span>';
+      }
+    }
+  </script>
+</head>
+<body>
+  <a href="index.html" class="enlace-react">⬅️ Volver a la versión React + CSS Interactiva</a>
+  <h1>Laboratorio. Tecnologías JavaScript y AJAX (Versión Clásica)</h1>
+
+  <div class="formulario">
+    <label for="recurso"><strong>URL a descargar:</strong></label><br><br>
+    <input type="text" id="recurso" size="60">
+    <input type="button" id="enviar" value="Mostrar Contenidos" onclick="mostrarContenidos();">
+  </div>
+
+  <div class="panel">
+    <h3>Estados de la petición (Criterio 7)</h3>
+    <div id="estados"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Código de estado (Criterio 9)</h3>
+    <div id="codigo"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Cabeceras HTTP de la respuesta del servidor (Criterio 8)</h3>
+    <div id="cabeceras" style="font-family: monospace; font-size: 13px; max-height: 180px; overflow: auto; background: #f8fafc; padding: 8px;"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Contenidos del archivo (Criterio 6)</h3>
+    <div id="contenidos" class="zona-contenido"></div>
+  </div>
+</body>
+</html>
+

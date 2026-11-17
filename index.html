@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio: Tecnologías JavaScript y AJAX | Solución React</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- React 18 y Babel Standalone (Copia local para funcionamiento 100% offline y fallback CDN) -->
+  <script src="lib/react.production.min.js"></script>
+  <script>if (!window.React) document.write('<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin><\/script>');</script>
+  <script src="lib/react-dom.production.min.js"></script>
+  <script>if (!window.ReactDOM) document.write('<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin><\/script>');</script>
+  <script src="lib/babel.min.js"></script>
+  <script>if (!window.Babel) document.write('<script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>');</script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // =========================================================================
+    // COMPONENTE: NAVBAR & HEADER
+    // =========================================================================
+    function Header({ activeTab, setActiveTab }) {
+      return (
+        <header className="app-header">
+          <div className="header-content">
+            <div className="brand-section">
+              <div className="brand-icon">⚡</div>
+              <div className="title-group">
+                <h1>Laboratorio: Tecnologías JavaScript y AJAX</h1>
+                <p>Implementación Interactiva con React y CSS | Desarrollo Web en Entorno Cliente</p>
+              </div>
+            </div>
+            <div className="header-badges">
+              <span className="badge badge-react">⚛️ React 18</span>
+              <span className="badge badge-js">📜 JavaScript ES6+</span>
+              <span className="badge badge-ajax">🔄 AJAX (XHR)</span>
+            </div>
+          </div>
+        </header>
+      );
+    }
+
+    // =========================================================================
+    // COMPONENTE: NAVEGACIÓN POR PESTAÑAS
+    // =========================================================================
+    function TabNav({ activeTab, setActiveTab }) {
+      return (
+        <div className="nav-tabs-wrapper">
+          <nav className="nav-tabs">
+            <button 
+              className={`tab-btn ${activeTab === 'todos' ? 'active' : ''}`}
+              onClick={() => setActiveTab('todos')}
+            >
+              📑 Vista Completa
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'js' ? 'active' : ''}`}
+              onClick={() => setActiveTab('js')}
+            >
+              🧮 Ejercicios de JavaScript
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'ajax' ? 'active' : ''}`}
+              onClick={() => setActiveTab('ajax')}
+            >
+              🌐 Laboratorio AJAX
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'rubrica' ? 'active' : ''}`}
+              onClick={() => setActiveTab('rubrica')}
+            >
+              📋 Especificaciones Técnicas
+            </button>
+          </nav>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // EJERCICIO JS 1: PALÍNDROMO (Criterio 1)
+    // =========================================================================
+    function PalindromeExercise() {
+      const [input, setInput] = useState('Anita lava la tina');
+      const [analysis, setAnalysis] = useState(null);
+
+      const checkPalindrome = (str) => {
+        if (!str || str.trim() === '') {
+          setAnalysis(null);
+          return;
+        }
+        // Normalización: minúsculas, remover tildes y caracteres no alfanuméricos
+        const normalized = str
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]/g, '');
+
+        const reversed = normalized.split('').reverse().join('');
+        const isPalindrome = normalized.length > 0 && normalized === reversed;
+
+        setAnalysis({
+          original: str,
+          normalized,
+          reversed,
+          isPalindrome,
+          length: normalized.length
+        });
+      };
+
+      useEffect(() => {
+        checkPalindrome(input);
+      }, []);
+
+      return (
+        <div className="exercise-card">
+          <div className="card-header">
+            <div className="card-title-wrap">
+              <span className="card-number">1</span>
+              <h3 className="card-title">Detección de Palíndromos</h3>
+            </div>
+            <span className="criterio-tag">Ejercicio 1</span>
+          </div>
+          <div className="card-body">
+            <p className="exercise-instruction">
+              Determina si la cadena de texto ingresada se lee exactamente igual de izquierda a derecha que de derecha a izquierda, ignorando espacios, puntuación y tildes.
+            </p>
+
+            <div className="form-group">
+              <label className="form-label">Cadena de entrada:</label>
+              <input 
+                type="text" 
+                className="input-text" 
+                value={input}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  checkPalindrome(e.target.value);
+                }}
+                placeholder="Escribe una palabra o frase..."
+              />
+            </div>
+
+            <div className="presets-group">
+              <span className="preset-label">Ejemplos:</span>
+              <button className="preset-btn" onClick={() => { setInput('Anita lava la tina'); checkPalindrome('Anita lava la tina'); }}>Anita lava la tina</button>
+              <button className="preset-btn" onClick={() => { setInput('Dábale arroz a la zorra el abad'); checkPalindrome('Dábale arroz a la zorra el abad'); }}>Dábale arroz...</button>
+              <button className="preset-btn" onClick={() => { setInput('reconocer'); checkPalindrome('reconocer'); }}>reconocer</button>
+              <button className="preset-btn" onClick={() => { setInput('JavaScript y React'); checkPalindrome('JavaScript y React'); }}>No palíndromo</button>
+            </div>
+
+            {analysis && (
+              <div className="result-box">
+                <div className={`result-badge ${analysis.isPalindrome ? 'result-success' : 'result-danger'}`}>
+                  {analysis.isPalindrome ? '✅ ¡Es un Palíndromo!' : '❌ No es un Palíndromo'}
+                </div>
+
+                <div className="details-grid">
+                  <div className="detail-item">
+                    <span>Cadena Normalizada:</span>
+                    <strong>{analysis.normalized || '(vacío)'}</strong>
+                  </div>
+                  <div className="detail-item">
+                    <span>Cadena Invertida:</span>
+                    <strong>{analysis.reversed || '(vacío)'}</strong>
+                  </div>
+                  <div className="detail-item">
+                    <span>Caracteres analizados:</span>
+                    <strong>{analysis.length} caracteres</strong>
+                  </div>
+                  <div className="detail-item">
+                    <span>Resultado Lógico:</span>
+                    <strong>{analysis.isPalindrome ? 'true' : 'false'}</strong>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // EJERCICIO JS 2: MAYOR DE DOS NÚMEROS (Criterio 2)
+    // =========================================================================
+    function MaxNumberExercise() {
+      const [num1, setNum1] = useState(42);
+      const [num2, setNum2] = useState(15);
+      const [result, setResult] = useState(null);
+
+      const compare = (n1, n2) => {
+        const val1 = parseFloat(n1);
+        const val2 = parseFloat(n2);
+
+        if (isNaN(val1) || isNaN(val2)) {
+          setResult({ error: 'Por favor, ingresa dos números válidos.' });
+          return;
+        }
+
+        if (val1 > val2) {
+          setResult({
+            mayor: val1,
+            menor: val2,
+            tipo: 'primer_mayor',
+            mensaje: `El primer número (${val1}) es MAYOR que el segundo número (${val2}).`,
+            diferencia: (val1 - val2).toFixed(2)
+          });
+        } else if (val2 > val1) {
+          setResult({
+            mayor: val2,
+            menor: val1,
+            tipo: 'segundo_mayor',
+            mensaje: `El segundo número (${val2}) es MAYOR que el primer número (${val1}).`,
+            diferencia: (val2 - val1).toFixed(2)
+          });
+        } else {
+          setResult({
+            mayor: val1,
+            menor: val2,
+            tipo: 'iguales',
+            mensaje: `Ambos números son IGUALES (${val1} = ${val2}).`,
+            diferencia: 0
+          });
+        }
+      };
+
+      useEffect(() => {
+        compare(num1, num2);
+      }, [num1, num2]);
+
+      return (
+        <div className="exercise-card">
+          <div className="card-header">
+            <div className="card-title-wrap">
+              <span className="card-number">2</span>
+              <h3 className="card-title">Mayor de Dos Números</h3>
+            </div>
+            <span className="criterio-tag">Ejercicio 2</span>
+          </div>
+          <div className="card-body">
+            <p className="exercise-instruction">
+              Programa que solicita dos valores numéricos (enteros o decimales, positivos o negativos) y determina cuál de ellos es el mayor.
+            </p>
+
+            <div className="inputs-row">
+              <div className="form-group">
+                <label className="form-label">Número 1 (A):</label>
+                <input 
+                  type="number" 
+                  className="input-text" 
+                  value={num1}
+                  onChange={(e) => setNum1(e.target.value)}
+                  step="any"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Número 2 (B):</label>
+                <input 
+                  type="number" 
+                  className="input-text" 
+                  value={num2}
+                  onChange={(e) => setNum2(e.target.value)}
+                  step="any"
+                />
+              </div>
+            </div>
+
+            <div className="presets-group">
+              <span className="preset-label">Presets:</span>
+              <button className="preset-btn" onClick={() => { setNum1(120); setNum2(85); }}>120 vs 85</button>
+              <button className="preset-btn" onClick={() => { setNum1(-15); setNum2(-3); }}>-15 vs -3</button>
+              <button className="preset-btn" onClick={() => { setNum1(99.75); setNum2(99.75); }}>Iguales (99.75)</button>
+              <button className="preset-btn" onClick={() => { setNum1(3.14159); setNum2(2.71828); }}>Pi vs Euler</button>
+            </div>
+
+            {result && (
+              <div className="result-box">
+                {result.error ? (
+                  <div className="result-badge result-danger">⚠️ {result.error}</div>
+                ) : (
+                  <>
+                    <div className="result-badge result-info">
+                      🏆 {result.mensaje}
+                    </div>
+                    <div className="details-grid">
+                      <div className="detail-item">
+                        <span>Valor Mayor:</span>
+                        <strong style={{color: '#16a34a'}}>{result.tipo === 'iguales' ? 'Ninguno (Empate)' : result.mayor}</strong>
+                      </div>
+                      <div className="detail-item">
+                        <span>Valor Menor:</span>
+                        <strong style={{color: '#dc2626'}}>{result.tipo === 'iguales' ? 'Ninguno (Empate)' : result.menor}</strong>
+                      </div>
+                      <div className="detail-item">
+                        <span>Diferencia Absoluta:</span>
+                        <strong>{Math.abs(result.diferencia)}</strong>
+                      </div>
+                      <div className="detail-item">
+                        <span>Condición Lógica:</span>
+                        <strong>{result.tipo === 'primer_mayor' ? 'A > B' : result.tipo === 'segundo_mayor' ? 'B > A' : 'A === B'}</strong>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // EJERCICIO JS 3: VOCALES QUE APARECEN (Criterio 3)
+    // =========================================================================
+    function VowelsPresentExercise() {
+      const [phrase, setPhrase] = useState('El veloz murciélago hindú comía feliz cardillo y kiwi');
+      const [presentVowels, setPresentVowels] = useState([]);
+
+      const findVowels = (text) => {
+        if (!text || text.trim() === '') {
+          setPresentVowels([]);
+          return;
+        }
+        const normalized = text
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+
+        const allVowels = ['a', 'e', 'i', 'o', 'u'];
+        const found = allVowels.filter(v => normalized.includes(v));
+        setPresentVowels(found);
+      };
+
+      useEffect(() => {
+        findVowels(phrase);
+      }, [phrase]);
+
+      const allVowels = [
+        { char: 'a', label: 'A' },
+        { char: 'e', label: 'E' },
+        { char: 'i', label: 'I' },
+        { char: 'o', label: 'O' },
+        { char: 'u', label: 'U' }
+      ];
+
+      return (
+        <div className="exercise-card">
+          <div className="card-header">
+            <div className="card-title-wrap">
+              <span className="card-number">3</span>
+              <h3 className="card-title">Vocales que Aparecen en la Frase</h3>
+            </div>
+            <span className="criterio-tag">Ejercicio 3</span>
+          </div>
+          <div className="card-body">
+            <p className="exercise-instruction">
+              Analiza la frase ingresada e identifica cuáles de las 5 vocales (A, E, I, O, U) aparecen en ella (sin importar mayúsculas, minúsculas o tildes).
+            </p>
+
+            <div className="form-group">
+              <label className="form-label">Frase o texto a evaluar:</label>
+              <textarea 
+                className="input-textarea"
+                rows="2"
+                value={phrase}
+                onChange={(e) => setPhrase(e.target.value)}
+                placeholder="Escribe una frase..."
+              />
+            </div>
+
+            <div className="presets-group">
+              <span className="preset-label">Presets:</span>
+              <button className="preset-btn" onClick={() => setPhrase('Murciélago (contiene las 5 vocales)')}>Murciélago (Las 5)</button>
+              <button className="preset-btn" onClick={() => setPhrase('Desarrollo Web en JavaScript')}>Desarrollo Web</button>
+              <button className="preset-btn" onClick={() => setPhrase('Rhythm and lynx (sin vocales tradicionales)')}>Sin vocales</button>
+            </div>
+
+            <div className="result-box">
+              <span className="preset-label">Vocales detectadas ({presentVowels.length} de 5):</span>
+              <div className="vowels-pills">
+                {allVowels.map(v => {
+                  const isActive = presentVowels.includes(v.char);
+                  return (
+                    <div key={v.char} className={`vowel-pill ${isActive ? 'active' : ''}`}>
+                      <span>{v.label}</span>
+                      <small style={{fontSize: '0.65rem'}}>{isActive ? '✓' : '—'}</small>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="details-grid" style={{marginTop: '0.5rem'}}>
+                <div className="detail-item">
+                  <span>Lista de vocales presentes:</span>
+                  <strong>{presentVowels.length > 0 ? presentVowels.map(v => v.toUpperCase()).join(', ') : 'Ninguna'}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Vocales ausentes:</span>
+                  <strong>{['a','e','i','o','u'].filter(v => !presentVowels.includes(v)).map(v => v.toUpperCase()).join(', ') || 'Ninguna (Aparecen todas)'}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // EJERCICIO JS 4: CONTEO Y FRECUENCIA DE VOCALES (Criterio 4)
+    // =========================================================================
+    function VowelCountExercise() {
+      const [phrase, setPhrase] = useState('Universidad y Desarrollo de Aplicaciones Web');
+      const [counts, setCounts] = useState({ a: 0, e: 0, i: 0, o: 0, u: 0 });
+      const [totalVowels, setTotalVowels] = useState(0);
+      const [totalChars, setTotalChars] = useState(0);
+
+      const countVowels = (text) => {
+        const tally = { a: 0, e: 0, i: 0, o: 0, u: 0 };
+        if (!text) {
+          setCounts(tally);
+          setTotalVowels(0);
+          setTotalChars(0);
+          return;
+        }
+
+        const normalized = text
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+
+        let total = 0;
+        for (const char of normalized) {
+          if (tally.hasOwnProperty(char)) {
+            tally[char]++;
+            total++;
+          }
+        }
+
+        setCounts(tally);
+        setTotalVowels(total);
+        setTotalChars(text.length);
+      };
+
+      useEffect(() => {
+        countVowels(phrase);
+      }, [phrase]);
+
+      const maxCount = Math.max(...Object.values(counts), 1);
+
+      return (
+        <div className="exercise-card">
+          <div className="card-header">
+            <div className="card-title-wrap">
+              <span className="card-number">4</span>
+              <h3 className="card-title">Frecuencia y Conteo de Vocales</h3>
+            </div>
+            <span className="criterio-tag">Ejercicio 4</span>
+          </div>
+          <div className="card-body">
+            <p className="exercise-instruction">
+              Calcula con exactitud cuántas veces aparece cada una de las vocales en la frase introducida y representa su distribución estadística.
+            </p>
+
+            <div className="form-group">
+              <label className="form-label">Frase o texto a contabilizar:</label>
+              <textarea 
+                className="input-textarea"
+                rows="2"
+                value={phrase}
+                onChange={(e) => setPhrase(e.target.value)}
+                placeholder="Escribe una frase..."
+              />
+            </div>
+
+            <div className="presets-group">
+              <span className="preset-label">Presets:</span>
+              <button className="preset-btn" onClick={() => setPhrase('Programación en JavaScript y peticiones AJAX asíncronas')}>Programación AJAX</button>
+              <button className="preset-btn" onClick={() => setPhrase('El murciélago veloz saltaba sobre la paja')}>Murciélago veloz</button>
+              <button className="preset-btn" onClick={() => setPhrase('Abracadabra pata de cabra')}>Muchas A (Abracadabra)</button>
+            </div>
+
+            <div className="result-box">
+              <div className="vowel-bars">
+                {['a', 'e', 'i', 'o', 'u'].map(v => {
+                  const count = counts[v];
+                  const percent = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                  return (
+                    <div key={v} className="vowel-bar-item">
+                      <span className="vowel-bar-label">{v.toUpperCase()}</span>
+                      <div className="vowel-bar-track">
+                        <div className="vowel-bar-fill" style={{ width: `${percent}%` }}></div>
+                      </div>
+                      <span className="vowel-bar-count">{count} {count === 1 ? 'vez' : 'veces'}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="details-grid" style={{marginTop: '0.75rem'}}>
+                <div className="detail-item">
+                  <span>Total de Vocales:</span>
+                  <strong style={{color: '#2563eb'}}>{totalVowels}</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Longitud del texto:</span>
+                  <strong>{totalChars} caracteres</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Densidad de vocales:</span>
+                  <strong>{totalChars > 0 ? ((totalVowels / totalChars) * 100).toFixed(1) : 0}%</strong>
+                </div>
+                <div className="detail-item">
+                  <span>Vocal más frecuente:</span>
+                  <strong>{Object.entries(counts).reduce((a, b) => b[1] > a[1] ? b : a)[0].toUpperCase()}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SECCIÓN AJAX: IMPLEMENTACIÓN RIGUROSA (Criterios 5 a 9)
+    // =========================================================================
+    function AjaxLab() {
+      // Criterio 5: Al cargar la página, el cuadro de texto debe mostrar por defecto la URL de la propia página.
+      const [url, setUrl] = useState('');
+      const [currentReadyState, setCurrentReadyState] = useState(0);
+      const [stateLogs, setStateLogs] = useState([]);
+      const [statusCode, setStatusCode] = useState(null);
+      const [statusText, setStatusText] = useState('No iniciada');
+      const [headers, setHeaders] = useState('Esperando petición...');
+      const [parsedHeaders, setParsedHeaders] = useState([]);
+      const [content, setContent] = useState('Presione "Mostrar Contenidos" para realizar la petición AJAX.');
+      const [isLoading, setIsLoading] = useState(false);
+      const xhrRef = useRef(null);
+
+      // Inicialización al cargar la página (Criterio 5)
+      useEffect(() => {
+        // Obtenemos la URL actual de la propia página
+        const currentUrl = window.location.href;
+        setUrl(currentUrl);
+        logState(0, 'UNSENT (Petición no iniciada)');
+      }, []);
+
+      const readyStateNames = [
+        { code: 0, name: 'UNSENT', desc: '0 - Petición no iniciada' },
+        { code: 1, name: 'OPENED', desc: '1 - Conexión abierta / Cargando' },
+        { code: 2, name: 'HEADERS_RECEIVED', desc: '2 - Cabeceras recibidas del servidor' },
+        { code: 3, name: 'LOADING', desc: '3 - Descargando contenido de la respuesta' },
+        { code: 4, name: 'DONE', desc: '4 - Petición completada' }
+      ];
+
+      const logState = (stateCode, description) => {
+        const time = new Date().toLocaleTimeString('es-ES', { hour12: false }) + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
+        setStateLogs(prev => [...prev, { time, code: stateCode, desc: description }]);
+        setCurrentReadyState(stateCode);
+      };
+
+      // Criterio 6, 7, 8, 9: Ejecutar petición AJAX con XMLHttpRequest
+      const executeAjax = () => {
+        if (!url || url.trim() === '') {
+          alert('Por favor, ingresa una URL válida.');
+          return;
+        }
+
+        setIsLoading(true);
+        setStateLogs([]); // Reiniciar historial de estados
+        setHeaders('Cargando cabeceras...');
+        setParsedHeaders([]);
+        setContent('Descargando contenido del servidor mediante XMLHttpRequest...');
+        setStatusCode(null);
+        setStatusText('En proceso...');
+
+        // 1. Instanciación del objeto nativo XMLHttpRequest
+        const xhr = new XMLHttpRequest();
+        xhrRef.current = xhr;
+
+        // Criterio 7: Seguimiento de Estados en todo momento mediante onreadystatechange
+        xhr.onreadystatechange = function() {
+          const state = xhr.readyState;
+          const stateInfo = readyStateNames.find(s => s.code === state);
+          logState(state, stateInfo ? `${stateInfo.name}: ${stateInfo.desc}` : `Estado ${state}`);
+
+          // En estado 2: Cabeceras recibidas
+          if (state === 2) {
+            try {
+              const rawHeaders = xhr.getAllResponseHeaders();
+              setHeaders(rawHeaders || '(Cabeceras recibidas, pero vacías o restringidas por política de seguridad)');
+              parseHeaders(rawHeaders);
+            } catch (e) {
+              setHeaders('Error al obtener cabeceras: ' + e.message);
+            }
+          }
+
+          // En estado 4: Petición completada (Criterio 6, 8, 9)
+          if (state === 4) {
+            setIsLoading(false);
+            
+            // Criterio 9: Mostrar código y texto de estado
+            const code = xhr.status;
+            const text = xhr.statusText || (code === 200 ? 'OK' : code === 0 ? 'Fallo de Red o Restricción CORS' : 'Completado');
+            setStatusCode(code);
+            setStatusText(text);
+
+            // Criterio 8: Cabeceras finales
+            const rawHeaders = xhr.getAllResponseHeaders();
+            setHeaders(rawHeaders || '(Cabeceras HTTP no disponibles)');
+            parseHeaders(rawHeaders);
+
+            // Criterio 6: Mostrar contenido de la respuesta en Contenidos del archivo
+            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+              setContent(xhr.responseText || '(Respuesta del servidor vacía - longitud 0 bytes)');
+            } else if (xhr.status === 0) {
+              // Explicación técnica clara si se ejecuta bajo protocolo file:// o bloqueo CORS
+              setContent(
+                `[AVISO DE SEGURIDAD / CORS]\n` +
+                `Código de estado: 0\n` +
+                `Causa: Si está abriendo el archivo directamente con protocolo "file://", el navegador bloquea peticiones XMLHttpRequest por política de origen idéntico (Same-Origin Policy).\n\n` +
+                `SOLUCIÓN:\n` +
+                `1. Ejecute el script "iniciar_servidor.bat" incluido en la carpeta.\n` +
+                `2. O inicie con: python servidor.py\n` +
+                `3. La aplicación se abrirá en http://localhost:8000/index.html donde todas las peticiones AJAX funcionan al 100%.\n\n` +
+                `Detalles de la URL solicitada: ${url}`
+              );
+            } else {
+              setContent(
+                `[RESPUESTA DE ERROR DEL SERVIDOR]\n` +
+                `Código: ${xhr.status} ${xhr.statusText}\n\n` +
+                `Cuerpo de respuesta:\n${xhr.responseText || '(Sin cuerpo de error)'}`
+              );
+            }
+          }
+        };
+
+        xhr.onerror = function() {
+          setIsLoading(false);
+          setStatusCode(xhr.status || 0);
+          setStatusText('Error en la petición de red (Network Error)');
+          logState(4, 'ERROR: Petición abortada o bloqueada');
+        };
+
+        xhr.ontimeout = function() {
+          setIsLoading(false);
+          setStatusText('Tiempo de espera agotado (Timeout)');
+          logState(4, 'TIMEOUT: La petición excedió el tiempo límite');
+        };
+
+        // 2. Apertura y envío de la petición
+        try {
+          xhr.open('GET', url, true);
+          xhr.timeout = 10000; // 10 segundos
+          xhr.send(null);
+        } catch (err) {
+          setIsLoading(false);
+          setStatusText('Excepción al abrir la petición: ' + err.message);
+          setContent('Excepción: ' + err.message);
+        }
+      };
+
+      const parseHeaders = (raw) => {
+        if (!raw) {
+          setParsedHeaders([]);
+          return;
+        }
+        const lines = raw.trim().split(/[\r\n]+/);
+        const headerPairs = [];
+        lines.forEach(line => {
+          const parts = line.split(': ');
+          const key = parts.shift();
+          const val = parts.join(': ');
+          if (key) {
+            headerPairs.push({ key, val });
+          }
+        });
+        setParsedHeaders(headerPairs);
+      };
+
+      const setPresetUrl = (targetUrl) => {
+        setUrl(targetUrl);
+      };
+
+      const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
+        alert('Contenido copiado al portapapeles.');
+      };
+
+      return (
+        <section className="ajax-container">
+          <div className="ajax-header">
+            <div className="section-title">
+              <span>🌐</span>
+              <h2>Laboratorio AJAX: Gestión Asíncrona con XMLHttpRequest</h2>
+            </div>
+            <p className="section-desc">
+              Implementación de cliente HTTP asíncrono para inspección de recursos, cabeceras, estados y contenidos.
+            </p>
+          </div>
+
+          {/* CONTROLES Y CUADRO DE TEXTO DE URL */}
+          <div className="ajax-controls">
+            <div className="form-group">
+              <label className="form-label" style={{display: 'flex', justifyContent: 'space-between'}}>
+                <span><strong>URL del Recurso a Consultar:</strong> Carga por defecto la dirección de la propia página</span>
+                <span className="criterio-tag">Requisito AJAX 1</span>
+              </label>
+              <div className="url-input-row">
+                <input 
+                  type="text" 
+                  className="input-text url-input" 
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="http://..."
+                />
+                <button 
+                  className="btn-primary"
+                  onClick={executeAjax}
+                  disabled={isLoading}
+                >
+                  {isLoading ? '⏳ Descargando...' : '📥 Mostrar Contenidos'}
+                </button>
+                <button 
+                  className="btn-secondary"
+                  onClick={() => {
+                    setUrl(window.location.href);
+                    executeAjax();
+                  }}
+                  title="Restablece la URL a la página actual y descarga"
+                >
+                  🔄 Recargar Propia URL
+                </button>
+              </div>
+            </div>
+
+            <div className="ajax-presets-bar">
+              <span className="preset-label">URLs de prueba preparadas:</span>
+              <button className="preset-btn" onClick={() => setPresetUrl(window.location.href)}>
+                🏠 Propia URL
+              </button>
+              <button className="preset-btn" onClick={() => setPresetUrl('data/ejemplo.txt')}>
+                📄 Archivo Texto (ejemplo.txt)
+              </button>
+              <button className="preset-btn" onClick={() => setPresetUrl('data/datos.json')}>
+                📊 JSON (datos.json)
+              </button>
+              <button className="preset-btn" onClick={() => setPresetUrl('data/fragmento.html')}>
+                🧩 Fragmento HTML (fragmento.html)
+              </button>
+              <button className="preset-btn" onClick={() => setPresetUrl('https://jsonplaceholder.typicode.com/todos/1')}>
+                🌐 API Externa (JSONPlaceholder)
+              </button>
+              <button className="preset-btn" onClick={() => setPresetUrl('data/no_existe_404.txt')}>
+                ⚠️ Probar Error 404
+              </button>
+            </div>
+          </div>
+
+          {/* GRID DE LAS ZONAS REQUERIDAS EN LA GUÍA */}
+          <div className="ajax-zones-grid">
+
+            {/* ZONA 1: ESTADOS DE LA PETICIÓN */}
+            <div className="ajax-zone-card">
+              <div className="zone-header">
+                <span className="zone-title">
+                  <span>⏱️</span> Zona: Estados de la petición
+                </span>
+                <span className="zone-rubric">Requisito AJAX 3</span>
+              </div>
+              <div className="zone-content">
+                <div className="state-indicator-wrap">
+                  <div className="state-current-badge">
+                    <span className="state-current-code">readyState = {currentReadyState}</span>
+                    <div>
+                      <div className="state-current-name">
+                        {readyStateNames.find(s => s.code === currentReadyState)?.name}
+                      </div>
+                      <div className="state-current-desc">
+                        {readyStateNames.find(s => s.code === currentReadyState)?.desc}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Línea de tiempo de pasos (0 al 4) */}
+                  <div className="state-timeline">
+                    {readyStateNames.map(step => {
+                      const isCompleted = currentReadyState > step.code;
+                      const isCurrent = currentReadyState === step.code;
+                      return (
+                        <div key={step.code} className={`timeline-step ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}>
+                          <div className="timeline-circle">
+                            {isCompleted ? '✓' : step.code}
+                          </div>
+                          <span className="timeline-label">{step.name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div>
+                    <span className="preset-label">Registro en tiempo real de transiciones:</span>
+                    <div className="state-log-list">
+                      {stateLogs.length === 0 ? (
+                        <div style={{color: '#94a3b8', padding: '0.4rem'}}>Sin actividad registrada</div>
+                      ) : (
+                        stateLogs.map((log, idx) => (
+                          <div key={idx} className="state-log-item">
+                            <span>[{log.time}] <strong>readyState {log.code}</strong></span>
+                            <span>{log.desc}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ZONA 2 & 3: CABECERAS Y CÓDIGO DE ESTADO */}
+            <div style={{display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
+              
+              {/* ZONA 3: CÓDIGO DE ESTADO */}
+              <div className="ajax-zone-card">
+                <div className="zone-header">
+                  <span className="zone-title">
+                    <span>🚦</span> Zona: Código de estado
+                  </span>
+                  <span className="zone-rubric">Requisito AJAX 5</span>
+                </div>
+                <div className="zone-content">
+                  <div className="status-code-display">
+                    <div className={`status-badge-big ${
+                      statusCode >= 200 && statusCode < 300 ? 'status-badge-2xx' :
+                      statusCode >= 400 && statusCode < 500 ? 'status-badge-4xx' :
+                      statusCode >= 500 ? 'status-badge-5xx' : 'status-badge-init'
+                    }`}>
+                      {statusCode !== null ? statusCode : '---'}
+                    </div>
+                    <div className="status-text-info">
+                      <h4>Texto de Respuesta: {statusText}</h4>
+                      <p>
+                        {statusCode === 200 && 'Petición procesada exitosamente por el servidor HTTP.'}
+                        {statusCode === 404 && 'El recurso solicitado no fue encontrado en el servidor (404 Not Found).'}
+                        {statusCode === 0 && 'Sin respuesta del servidor o bloqueado por política CORS.'}
+                        {statusCode === null && 'Esperando inicio de la petición AJAX.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ZONA 2: CABECERAS HTTP DE LA RESPUESTA */}
+              <div className="ajax-zone-card">
+                <div className="zone-header">
+                  <span className="zone-title">
+                    <span>📋</span> Zona: Cabeceras HTTP de la respuesta del servidor
+                  </span>
+                  <span className="zone-rubric">Requisito AJAX 4</span>
+                </div>
+                <div className="zone-content">
+                  {parsedHeaders.length > 0 ? (
+                    <div className="headers-container">
+                      {parsedHeaders.map((h, i) => (
+                        <div key={i}>
+                          <span className="header-key">{h.key}:</span> <span className="header-val">{h.val}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="headers-container" style={{color: '#94a3b8'}}>
+                      {headers}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* ZONA 4: CONTENIDOS DEL ARCHIVO */}
+            <div className="ajax-zone-card full-width">
+              <div className="zone-header">
+                <span className="zone-title">
+                  <span>📄</span> Zona: Contenidos del archivo
+                </span>
+                <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
+                  <span className="zone-rubric">Requisito AJAX 2</span>
+                  <button className="viewer-btn" onClick={() => copyToClipboard(content)}>
+                    📋 Copiar Contenido
+                  </button>
+                </div>
+              </div>
+              <div className="zone-content" style={{padding: 0}}>
+                <div className="content-viewer-wrap">
+                  <div className="viewer-toolbar">
+                    <span>Tamaño: {new Blob([content]).size} bytes | Líneas: {content.split('\n').length}</span>
+                    <span>Formato detectado: {url.endsWith('.json') ? 'JSON' : url.endsWith('.html') ? 'HTML' : 'Texto Plano'}</span>
+                  </div>
+                  <pre className="content-box">
+                    <code>{content}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      );
+    }
+
+    // =========================================================================
+    // SECCIÓN ESPECIFICACIONES TÉCNICAS Y DOCUMENTACIÓN
+    // =========================================================================
+    function RubricSection() {
+      const specifications = [
+        { id: 1, categoria: 'JavaScript', nombre: 'Detección de Palíndromos', desc: 'Normaliza la cadena ignorando tildes, signos y espacios para verificar simetría.', componente: 'PalindromeExercise' },
+        { id: 2, categoria: 'JavaScript', nombre: 'Mayor de Dos Números', desc: 'Compara dos números enteros o reales y emite el mayor o la condición de igualdad.', componente: 'MaxNumberExercise' },
+        { id: 3, categoria: 'JavaScript', nombre: 'Vocales Presentes', desc: 'Examina una frase y extrae el subconjunto de vocales que aparecen en el texto.', componente: 'VowelsPresentExercise' },
+        { id: 4, categoria: 'JavaScript', nombre: 'Frecuencia de Vocales', desc: 'Contabiliza con exactitud la cardinalidad de cada una de las cinco vocales.', componente: 'VowelCountExercise' },
+        { id: 5, categoria: 'AJAX', nombre: 'URL por Defecto', desc: 'El campo de entrada carga automáticamente la dirección window.location.href.', componente: 'AjaxLab (useEffect)' },
+        { id: 6, categoria: 'AJAX', nombre: 'Mostrar Contenidos', desc: 'Descarga mediante GET y vuelca el cuerpo de respuesta en Contenidos del archivo.', componente: 'AjaxLab (responseText)' },
+        { id: 7, categoria: 'AJAX', nombre: 'Estados de la Petición', desc: 'Monitorea en tiempo real readyState desde cero hasta cuatro con registro temporal.', componente: 'AjaxLab (onreadystatechange)' },
+        { id: 8, categoria: 'AJAX', nombre: 'Cabeceras HTTP', desc: 'Extrae y desglosa todas las cabeceras entregadas por getAllResponseHeaders().', componente: 'AjaxLab (Headers View)' },
+        { id: 9, categoria: 'AJAX', nombre: 'Código de Estado', desc: 'Captura el código numérico status y el mensaje oficial statusText del servidor.', componente: 'AjaxLab (Status Badge)' },
+        { id: 10, categoria: 'Documentación', nombre: 'Memoria Técnica', desc: 'Informe técnico formal en Word (.docx) y PDF con análisis de algoritmos y pruebas.', componente: 'Documentación Escrita' }
+      ];
+
+      return (
+        <section className="rubric-card">
+          <div className="section-title">
+            <span>📋</span>
+            <h2>Especificaciones Técnicas del Laboratorio</h2>
+          </div>
+          <p className="section-desc">
+            Resumen de los módulos desarrollados y la arquitectura de la solución cliente.
+          </p>
+
+          <div className="table-responsive">
+            <table className="rubric-table">
+              <thead>
+                <tr>
+                  <th>Ítem</th>
+                  <th>Bloque</th>
+                  <th>Requerimiento Técnico</th>
+                  <th>Módulo de la Solución</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {specifications.map(s => (
+                  <tr key={s.id}>
+                    <td><strong>{s.id}</strong></td>
+                    <td><span className={`badge ${s.categoria === 'JavaScript' ? 'badge-js' : s.categoria === 'AJAX' ? 'badge-ajax' : 'badge-react'}`}>{s.categoria}</span></td>
+                    <td>
+                      <strong>{s.nombre}</strong>
+                      <p style={{fontSize: '0.82rem', color: '#64748b', margin: '0.2rem 0 0'}}>{s.desc}</p>
+                    </td>
+                    <td><code>{s.componente}</code></td>
+                    <td>
+                      <span className="status-check">✅ Implementado y Verificado</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      );
+    }
+
+    // =========================================================================
+    // COMPONENTE PRINCIPAL (APP)
+    // =========================================================================
+    function App() {
+      const [activeTab, setActiveTab] = useState('todos');
+
+      return (
+        <div className="app-container">
+          <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+          <TabNav activeTab={activeTab} setActiveTab={setActiveTab} />
+
+          <main className="main-content">
+            <div className="intro-banner">
+              <div className="intro-text">
+                <h2>Solución del Laboratorio - JavaScript & AJAX</h2>
+                <p>Aplicación desarrollada con componentes React, estilos CSS modulares y objeto nativo <code>XMLHttpRequest</code> para peticiones asíncronas.</p>
+              </div>
+              <div className="rubric-pill">
+                <span>⚡ Aplicación Cliente Activa</span>
+              </div>
+            </div>
+
+            {/* SECCIÓN JAVASCRIPT */}
+            {(activeTab === 'todos' || activeTab === 'js') && (
+              <section style={{marginBottom: '3rem'}}>
+                <div className="section-title-group">
+                  <div className="section-title">
+                    <span>🧮</span>
+                    <h2>Bloque 1: Ejercicios de JavaScript</h2>
+                  </div>
+                  <p className="section-desc">Manipulación de cadenas, estructuras de control, algoritmos numéricos y filtrado de caracteres.</p>
+                </div>
+
+                <div className="js-grid">
+                  <PalindromeExercise />
+                  <MaxNumberExercise />
+                  <VowelsPresentExercise />
+                  <VowelCountExercise />
+                </div>
+              </section>
+            )}
+
+            {/* SECCIÓN AJAX */}
+            {(activeTab === 'todos' || activeTab === 'ajax') && (
+              <AjaxLab />
+            )}
+
+            {/* SECCIÓN ESPECIFICACIONES */}
+            {(activeTab === 'todos' || activeTab === 'rubrica') && (
+              <RubricSection />
+            )}
+          </main>
+
+          <footer className="app-footer">
+            <p><strong>Laboratorio de Tecnologías JavaScript y AJAX</strong> | Desarrollado con React 18, CSS3 y JavaScript ES6+</p>
+            <p style={{marginTop: '0.25rem', color: '#94a3b8'}}>Desarrollo Web en Entorno Cliente — Ingeniería Informática</p>
+          </footer>
+        </div>
+      );
+    }
+
+    // Renderizar la aplicación React en el DOM
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

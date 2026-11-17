@@ -1,0 +1,21 @@
+{
+  "name": "laboratorio-javascript-ajax-react",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Solución oficial del Laboratorio: Tecnologías JavaScript y AJAX en React y CSS",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.2"
+  }
+}
+
