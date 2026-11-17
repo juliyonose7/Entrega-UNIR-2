@@ -5,7 +5,7 @@ Este proyecto contiene la solución interactiva para la actividad **"Laboratorio
 
 ---
 
-## 📋 Estructura de la Solución y Módulos Desarrollados
+## Estructura de la Solución y Módulos Desarrollados
 
 | Ítem | Módulo | Descripción Técnica de la Implementación |
 | :---: | :--- | :--- |
@@ -22,7 +22,7 @@ Este proyecto contiene la solución interactiva para la actividad **"Laboratorio
 
 ---
 
-## 🚀 Cómo Ejecutar la Aplicación
+##  Cómo Ejecutar la Aplicación
 
 ### Opción A (Recomendada - Con Servidor Local HTTP):
 1. Haz doble clic en el archivo **`iniciar_servidor.bat`** (o ejecuta en consola `python servidor.py`).
@@ -35,7 +35,7 @@ Este proyecto contiene la solución interactiva para la actividad **"Laboratorio
 
 ---
 
-## 📁 Archivos Entregables
+## Archivos Entregables
 
 1. **`Solucion_Laboratorio_JavaScript_AJAX.docx`**: Memoria técnica formal para entrega en formato Microsoft Word (estilo sobrio en negro, sin mención a calificaciones ni paréntesis excesivos).
 2. **`Solucion_Laboratorio_JavaScript_AJAX.pdf`**: Documento generado en formato PDF para envío en la plataforma educativa (7 páginas, conforme al límite de 10 páginas).
